@@ -1,0 +1,30 @@
+{
+  "name": "bookmarklet-branch-generator",
+  "version": "0.0.1",
+  "description": "Browser bookmarklet to generate normalized branch names from issue links and summaries",
+  "main": "build-bookmarklet.js",
+  "scripts": {
+    "build": "node scripts/build-webpack.js",
+    "dev": "npm run build"
+  },
+  "keywords": [
+    "bookmarklet",
+    "branch",
+    "git",
+    "automation"
+  ],
+  "author": "",
+  "license": "MIT",
+  "devDependencies": {
+    "@babel/core": "^7.28.5",
+    "@babel/preset-env": "^7.28.5",
+    "babel-loader": "^10.0.0",
+    "terser": "^5.44.1",
+    "terser-webpack-plugin": "^5.3.14",
+    "webpack": "^5.103.0",
+    "webpack-cli": "^6.0.1"
+  },
+  "dependencies": {
+    "lodash": "^4.17.21"
+  }
+}

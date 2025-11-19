@@ -1,0 +1,83 @@
+name: Build and Release Bookmarklet
+
+on:
+  push:
+    branches:
+      - main
+      - master
+    tags:
+      - 'v*'
+  pull_request:
+    branches:
+      - main
+      - master
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    name: Build Bookmarklet
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Build bookmarklet
+        run: npm run build
+
+      - name: Check build output
+        run: ls -lah build/
+
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: bookmarklet-build
+          path: build/
+
+      - name: Create Release
+        if: startsWith(github.ref, 'refs/tags/v')
+        uses: softprops/action-gh-release@v1
+        with:
+          files: |
+            build/bookmarklet.txt
+            build/bookmarklet-bundled.js
+          body: |
+            ## Bookmarklet Bundle
+
+            **Version:** ${{ github.ref_name }}
+
+            ### Files:
+            - `bookmarklet.txt` - Ready to paste bookmarklet (copy & paste into browser)
+            - `bookmarklet-bundled.js` - Bundled JavaScript source
+
+            ### Installation:
+            1. Create a new bookmark in your browser
+            2. Copy the content from `bookmarklet.txt`
+            3. Paste it as the bookmark URL
+            4. Save and use!
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  build-status:
+    runs-on: ubuntu-latest
+    name: Build Status Check
+    if: always()
+    needs: build
+    steps:
+      - name: Report build status
+        run: |
+          if [ "${{ needs.build.result }}" = "success" ]; then
+            echo "✅ Build successful!"
+            exit 0
+          else
+            echo "❌ Build failed!"
+            exit 1
+          fi
